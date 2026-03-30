@@ -1,12 +1,14 @@
-const CACHE_NAME = 'cronometro-v1';
+const CACHE_NAME = 'cronometro-v3';
 const assets = [
   './',
   './index.html',
   './style.css',
-  './script.js'
+  './script.js',
+  './manifest.json',
+  './icon-192.jpg',
+  './icon-512.jpg'
 ];
 
-// Instala o Service Worker e salva os arquivos no cache
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
@@ -15,7 +17,6 @@ self.addEventListener('install', event => {
   );
 });
 
-// Intercepta as requisições para funcionar offline
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => {
