@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clean Study Timer</title>
     <link rel="stylesheet" href="style.css">
-</head>
+<link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="icon-192.png">
 <body>
     <div class="container">
         <div class="timer-display">
             <span id="time">00:00:00</span><span id="milliseconds">.00</span>
         </div>
-        <div class="controls">
+            <div class="controls">
             <button id="startBtn" onclick="start()" title="Iniciar">
                 <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </button>
@@ -24,5 +26,15 @@
         </div>
     </div>
     <script src="script.js"></script>
+    <script>
+        // Registra o Service Worker para funcionamento offline
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registrado!'))
+                    .catch(err => console.log('Erro ao registrar Service Worker:', err));
+            });
+        }
+    </script>
 </body>
 </html>
