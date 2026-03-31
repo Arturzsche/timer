@@ -1,39 +1,33 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clean Study Timer</title>
+    <title>Cronômetro de Estudos</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
-    <link rel="apple-touch-icon" href="icon-192.jpg">
-</head> <body>
+</head>
+<body>
     <div class="container">
-        <div class="timer-display">
-            <span id="time">00:00:00</span><span id="milliseconds">.00</span>
+        <div id="display">00:00:00<span id="milliseconds">.00</span></div>
+        
+        <div class="buttons">
+            <button id="startBtn">Iniciar</button>
+            <button id="pauseBtn">Pausar</button>
+            <button id="resetBtn">Zerar e Salvar</button>
         </div>
-        <div class="controls">
-            <button id="startBtn" onclick="start()" title="Iniciar">
-                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            </button>
-            <button id="pauseBtn" onclick="pause()" title="Pausar" style="display: none;">
-                <svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-            </button>
-            <button id="resetBtn" onclick="reset()" title="Resetar">
-                <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-            </button>
+
+        <div class="extras">
+            <div class="goal-setting">
+                <label for="goalInput">Meta da sessão (min):</label>
+                <input type="number" id="goalInput" value="50" min="1">
+            </div>
+            
+            <div class="log-section">
+                <h3>Tempo Estudado na Semana</h3>
+                <ul id="weeklyLog"></ul>
+            </div>
         </div>
     </div>
     <script src="script.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker registrado!'))
-                    .catch(err => console.log('Erro ao registrar Service Worker:', err));
-            });
-        }
-    </script>
 </body>
-    </html>
+</html>
