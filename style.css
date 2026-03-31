@@ -1,95 +1,63 @@
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
-body {
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    height: 100vh;
     background-color: #000000;
-    color: #ff9900;
-    font-family: 'Share Tech Mono', monospace;
+    color: #ffffff;
 }
 
 .container {
     text-align: center;
-    width: 100%;
-    max-width: 600px;
 }
 
-/* O transition cria o efeito suave na mudança de cor */
-#display {
-    font-size: 8rem; 
-    margin-bottom: 30px;
-    letter-spacing: 2px;
-    transition: color 1s ease-in-out; 
+.timer-display {
+    font-size: 8rem;
+    font-weight: 200;
+    letter-spacing: -2px;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    /* Essa é a linha mágica que alinha a largura dos números e para a tremedeira */
+    font-variant-numeric: tabular-nums; 
 }
 
 #milliseconds {
-    font-size: 4rem;
+    font-size: 0.5em; 
+    margin-left: 5px;
+    opacity: 0.7; 
 }
 
-/* Classe que será injetada pelo JS quando a meta for atingida */
-.goal-reached {
-    color: #4CAF50 !important; 
-}
-
-.buttons button {
-    border: none;
+.controls button {
+    background: none;
+    border: 1px solid #333333;
     padding: 12px 24px;
-    font-size: 1.2rem;
-    margin: 0 10px;
+    margin: 0 5px;
+    border-radius: 20px;
     cursor: pointer;
-    border-radius: 4px;
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-    transition: opacity 0.2s;
+    color: #aaaaaa;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.buttons button:hover { opacity: 0.8; }
-
-#startBtn { background-color: #4CAF50; color: white; }
-#pauseBtn { background-color: #e0e0e0; color: #333; }
-#resetBtn { background-color: #ffb10a; color: black; }
-
-/* Estilos dos novos elementos (minimalistas) */
-.extras {
-    margin-top: 40px;
-    font-family: Arial, sans-serif;
-    color: #555; /* Cor escura para não distrair */
+.controls button:hover {
+    background-color: #222222;
+    color: #ffffff;
+    border-color: #555555;
 }
 
-.goal-setting {
-    margin-bottom: 20px;
-}
-
-.goal-setting input {
-    background-color: #111;
-    border: 1px solid #333;
-    color: #ff9900;
-    padding: 5px;
-    border-radius: 4px;
-    width: 60px;
-    text-align: center;
-}
-
-.log-section h3 {
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-}
-
-#weeklyLog {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    font-size: 0.9rem;
-    color: #888;
-}
-
-#weeklyLog li {
-    padding: 5px 0;
-    border-bottom: 1px solid #222;
+.controls button svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
 }

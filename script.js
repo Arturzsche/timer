@@ -1,97 +1,111 @@
-let startTime = 0;
-let elapsedTime = 0;
+const timeElement = document.getElementById("time");
+const msElement = document.getElementById("milliseconds");
+
+// Puxa os dados salvos no navegador (ou começa do zero se for a primeira vez)
+let startTime = parseInt(localStorage.getItem('timerStartTime')) || 0;
+let elapsedTime = parseInt(localStorage.getItem('timerElapsedTime')) || 0;
+let isRunning = localStorage.getItem('timerIsRunning') === 'true';
 let timerInterval;
 
-const display = document.getElementById('display');
-const goalInput = document.getElementById('goalInput');
-const weeklyLog = document.getElementById('weeklyLog');
-
-// Nomes dos dias da semana para o registro
-const diasDaSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-
-// Inicializa o registro de estudos buscando do localStorage (ou cria um vazio)
-let studyLog = JSON.parse(localStorage.getItem('studyLog')) || {};
-
-// Função para renderizar o histórico na tela
-function renderLog() {
-    weeklyLog.innerHTML = '';
-    for (const [dia, tempoMs] of Object.entries(studyLog)) {
-        let hrs = Math.floor(tempoMs / 3600000);
-        let mins = Math.floor((tempoMs % 3600000) / 60000);
-        
-        let li = document.createElement('li');
-        li.textContent = `${dia}: ${hrs}h e ${mins}m estudados`;
-        weeklyLog.appendChild(li);
-    }
+// Função para salvar o estado atual no navegador
+function saveState() {
+    localStorage.setItem('timerStartTime', startTime);
+    localStorage.setItem('timerElapsedTime', elapsedTime);
+    localStorage.setItem('timerIsRunning', isRunning);
 }
-
-// Renderiza o histórico assim que a página carrega
-renderLog();
 
 function updateDisplay(time) {
-    let diffInHrs = time / 3600000;
-    let hh = Math.floor(diffInHrs);
-    let diffInMin = (diffInHrs - hh) * 60;
-    let mm = Math.floor(diffInMin);
-    let diffInSec = (diffInMin - mm) * 60;
-    let ss = Math.floor(diffInSec);
-    let diffInMs = (diffInSec - ss) * 100;
-    let ms = Math.floor(diffInMs);
+    let totalSeconds = Math.floor(time / 1000);
+    
+    let hours = Math.floor(totalSeconds / 3600);
+    let minutes = Math.floor((totalSeconds % 3600) / 60);
+    let seconds = totalSeconds % 60;
+    
+    let milliseconds = Math.floor((time % 1000) / 10); 
+    
+    let formattedHH = hours.toString().padStart(2, "0");
+    let formattedMM = minutes.toString().padStart(2, "0");
+    let formattedSS = seconds.toString().padStart(2, "0");
+    let formattedMS = milliseconds.toString().padStart(2, "0");
 
-    let formattedHH = hh.toString().padStart(2, "0");
-    let formattedMM = mm.toString().padStart(2, "0");
-    let formattedSS = ss.toString().padStart(2, "0");
-    let formattedMS = ms.toString().padStart(2, "0");
+    timeElement.textContent = `${formattedHH}:${formattedMM}:${formattedSS}`;
+    msElement.textContent = `.${formattedMS}`;
+}
 
-    display.innerHTML = `${formattedHH}:${formattedMM}:${formattedSS}<span id="milliseconds">.${formattedMS}</span>`;
+function updateTime() {
+    let currentTotal = elapsedTime + (Date.now() - startTime);
+    updateDisplay(currentTotal);
+}
 
-    // --- LÓGICA DO ALERTA VISUAL (Ideia 5) ---
-    const goalMs = goalInput.value * 60000; // Converte os minutos da meta em milissegundos
-    if (time >= goalMs && goalMs > 0) {
-        display.classList.add('goal-reached'); // Adiciona a cor verde
+function start() {
+    if (isRunning) return; // Evita bugar se apertar várias vezes
+    isRunning = true;
+    startTime = Date.now();
+    saveState();
+    timerInterval = setInterval(updateTime, 10);
+    showButton("PAUSE");
+}
+
+function pause() {
+    if (!isRunning) return;
+    isRunning = false;
+    clearInterval(timerInterval);
+    elapsedTime += Date.now() - startTime; // Acumula o tempo que passou
+    saveState();
+    updateDisplay(elapsedTime); // Crava o display no tempo exato da pausa
+    showButton("START");
+}
+
+function reset() {
+    isRunning = false;
+    clearInterval(timerInterval);
+    elapsedTime = 0;
+    startTime = Date.now();
+    saveState();
+    updateDisplay(0);
+    showButton("START");
+}
+
+function showButton(buttonKey) {
+    const startBtn = document.getElementById("startBtn");
+    const pauseBtn = document.getElementById("pauseBtn");
+    
+    if (buttonKey === "PAUSE") {
+        startBtn.style.display = "none";
+        pauseBtn.style.display = "inline-flex"; 
     } else {
-        display.classList.remove('goal-reached'); // Mantém/volta para o laranja
+        startBtn.style.display = "inline-flex";
+        pauseBtn.style.display = "none";
     }
 }
 
-document.getElementById('startBtn').addEventListener('click', () => {
-    if (!timerInterval) {
-        startTime = Date.now() - elapsedTime;
-        timerInterval = setInterval(() => {
-            elapsedTime = Date.now() - startTime;
-            updateDisplay(elapsedTime);
-        }, 10);
-    }
-});
-
-document.getElementById('pauseBtn').addEventListener('click', () => {
-    clearInterval(timerInterval);
-    timerInterval = null;
-});
-
-// --- LÓGICA DO REGISTRO DE SESSÕES (Ideia 2) ---
-document.getElementById('resetBtn').addEventListener('click', () => {
-    clearInterval(timerInterval);
-    timerInterval = null;
-    
-    // Se o cronômetro rodou mais de 1 minuto, salva no histórico antes de zerar
-    if (elapsedTime > 60000) { 
-        // Pega o dia de hoje (ex: 2 para Terça-feira) e busca o nome no array
-        const hoje = new Date().getDay(); 
-        const nomeDoDia = diasDaSemana[hoje];
-
-        // Soma o tempo atual ao tempo que já estava salvo naquele dia (se houver)
-        if (studyLog[nomeDoDia]) {
-            studyLog[nomeDoDia] += elapsedTime;
+// --- ATALHOS DO TECLADO ---
+document.addEventListener('keydown', function(event) {
+    // Tecla Espaço (Pausar/Iniciar)
+    if (event.code === 'Space') {
+        event.preventDefault(); // Impede a página de rolar para baixo
+        // Tira o foco do botão se estiver selecionado para não ativar 2x
+        if (document.activeElement) document.activeElement.blur(); 
+        
+        if (isRunning) {
+            pause();
         } else {
-            studyLog[nomeDoDia] = elapsedTime;
+            start();
         }
-
-        // Salva de volta no navegador
-        localStorage.setItem('studyLog', JSON.stringify(studyLog));
-        renderLog(); // Atualiza a lista na tela
+    } 
+    // Tecla Delete (Resetar)
+    else if (event.code === 'Delete') {
+        reset();
     }
-
-    elapsedTime = 0;
-    updateDisplay(elapsedTime);
 });
+
+// --- INICIALIZAÇÃO QUANDO A PÁGINA CARREGA ---
+if (isRunning) {
+    // Se a página foi fechada/atualizada enquanto rodava, ele continua calculando a diferença
+    timerInterval = setInterval(updateTime, 10);
+    showButton("PAUSE");
+} else {
+    // Se estava pausado, só mostra o tempo salvo
+    updateDisplay(elapsedTime);
+    showButton("START");
+}
